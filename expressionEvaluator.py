@@ -2,18 +2,16 @@ import re
 
 class ExpressionEvaluator:
     def __init__(self, variables=None):
-        # Определение операторов и их приоритета
         self.ops = {
             '+': (1, lambda a, b: a + b),
             '-': (1, lambda a, b: a - b),
             '*': (2, lambda a, b: a * b),
-            '/': (2, lambda a, b: a / b)
+            '/': (2, lambda a, b: a / b),
+            '==': (0, lambda a, b: a == b)  # Оператор сравнения
         }
-        # Словарь переменных и их значений
         self.variables = variables if variables is not None else {}
 
     def _apply_operator(self, operators, values):
-        # Выполняет операцию с двумя верхними значениями в стеке значений
         operator = operators.pop()
         b = values.pop()
         a = values.pop()
@@ -21,40 +19,34 @@ class ExpressionEvaluator:
         values.append(operation(a, b))
 
     def evaluate_expression(self, expression):
-        # Подготовка выражения и разбиение на токены
-        expression = re.sub(r'\s+', '', expression)  # Удаление пробелов
-        tokens = re.findall(r'\d+|[+\-*/()]|\b[a-zA-Z]\b', expression)
-        values = []  # Стек для чисел
-        operators = []  # Стек для операторов
+        expression = re.sub(r'\s+', '', expression)
+        # Обновленная регулярка для корректного разделения '=='
+        tokens = re.findall(r'\d+|[+\-*/()]|==|\b[a-zA-Z]\b', expression)
+        values = []
+        operators = []
 
         for token in tokens:
             if token.isdigit():
-                # Добавление числа в стек значений
                 values.append(int(token))
             elif token in self.variables:
-                # Замена переменной на её значение
-                values.append(self.variables[token])
+                # Для поддержки логических значений в переменных
+                val = self.variables[token]
+                values.append(val if isinstance(val, bool) else int(val))
             elif token == '(':
-                # Открывающую скобку помещаем в стек операторов
                 operators.append(token)
             elif token == ')':
-                # Вычисляем выражение внутри скобок
                 while operators[-1] != '(':
                     self._apply_operator(operators, values)
-                operators.pop()  # Удаление открывающей скобки '(' из стека операторов
+                operators.pop()
             elif token in self.ops:
-                # Применение операторов с учетом их приоритета
                 while (operators and operators[-1] in self.ops and
                        self.ops[operators[-1]][0] >= self.ops[token][0]):
                     self._apply_operator(operators, values)
                 operators.append(token)
 
-        # Применяем оставшиеся операторы
         while operators:
             self._apply_operator(operators, values)
 
-        # Возвращаем результат
-        if len(values) != 1:
-            return expression
-            # raise SyntaxError("Invalid expression")
+        # Возвращаемое значение уже может быть логическим из-за оператора '=='
         return values.pop()
+
