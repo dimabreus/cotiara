@@ -66,12 +66,90 @@ var a = 2 > 1
 var a = 1 < 2
 ```
 
+### Оператор >=
+
+```cotiara
+var a = 1 >= 1
+```
+
+### Оператор <=
+
+```cotiara
+var a = 1 <= 1
+```
+
 ### Оператор && (И)
 
 ```cotiara
 var a = 1 == 1
+var b = 1 == 2
+var c = a && b /* False */
+```
+
+```cotiara
+var a = 1 == 1
 var b = 2 == 2
-var
+var c = a && b /* True */
+```
+
+### Оператор || (ИЛИ)
+
+```cotiara
+var a = 1 == 1
+var b = 1 == 2
+var c = a || b /* True */
+```
+
+```cotiara
+var a = 1 == 1
+var b = 2 == 2
+var c = a || b /* True */
+```
+
+## Вывод текста
+
+### echo
+
+```cotiara
+echo aboba /* aboba */
+```
+
+```cotiara
+var a = 1
+echo %a% /* 1 */
+```
+## Комментарии
+
+```cotiara
+/* Комментарий */
+```
+
+## Циклы
+
+### loop
+
+```cotiara
+loop 5 {
+echo hi
+}
+/*
+hi
+hi
+hi
+hi
+hi
+*/
+```
+
+## Проверки
+
+### if
+
+```cotiara
+if 1 == 1 {
+echo hi
+}
+/* hi */
 ```
 
 ## Основные функции языка:

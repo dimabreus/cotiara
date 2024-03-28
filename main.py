@@ -150,22 +150,20 @@ class Interpreter:
         pyautogui.rightClick(int(x), int(y))
 
 
-# Пример использования интерпретатора
+
+
 if __name__ == "__main__":
     interpreter = Interpreter()
     multiline_command = ""  # Для хранения многострочных команд
     inside_multi_line = False  # Флаг, указывающий на то, что мы внутри блока loop или if
     multi_line_type = None  # Тип многострочного блока: loop или if
 
-    while True:
-        try:
-            # Если мы не внутри многострочной команды, читаем новую строку
-            if not inside_multi_line:
-                expression = input(">> ")
-            else:
-                # Добавляем строки к многострочной команде
-                expression = input(".. ")
-                multiline_command += "\n" + expression
+    with open("code.cot", "r") as file:  # Открываем файл для чтения
+        for line in file:  # Читаем файл построчно
+            expression = line.strip()  # Убираем пробельные символы с начала и конца строки
+
+            if not expression:  # Пропускаем пустые строки
+                continue
 
             # Проверяем, начинается ли строка с loop или if и устанавливаем флаги
             if (expression.startswith("loop") or expression.startswith("if")) and not inside_multi_line:
@@ -173,6 +171,10 @@ if __name__ == "__main__":
                 multi_line_type = "loop" if expression.startswith("loop") else "if"
                 multiline_command = expression
                 continue  # Пропускаем дальнейшую обработку и ждем следующий ввод
+
+            if inside_multi_line:
+                # Добавляем строки к многострочной команде
+                multiline_command += "\n" + expression
 
             # Если мы находим закрывающую скобку, обрабатываем многострочную команду
             if inside_multi_line and expression.rstrip().endswith("}"):
@@ -183,14 +185,9 @@ if __name__ == "__main__":
                     interpreter.interpret(multiline_command)  # Обработка loop
                 multiline_command = ""  # Сбрасываем многострочную команду
                 multi_line_type = None  # Сбрасываем тип многострочного блока
-                continue  # Пропускаем дальнейшую обработку и ждем следующий ввод
+                continue  # Пропускаем дальнейшую обработку
 
             # Обычная обработка команды, если мы не в многострочном режиме
             if not inside_multi_line:
                 interpreter.interpret(expression)
                 print(interpreter.vars)
-
-        except KeyboardInterrupt:
-            break
-        except Exception as e:
-            print("Error:", e)
