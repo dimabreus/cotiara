@@ -1,6 +1,9 @@
 import re
+
 import pyautogui
+
 from expressionEvaluator import ExpressionEvaluator
+
 
 class Interpreter:
     def __init__(self):
@@ -8,6 +11,8 @@ class Interpreter:
 
     # Метод для интерпретации выражения
     def interpret(self, expression):
+        expression = re.sub(r"/\*.*?\*/", "", expression, flags=re.DOTALL)
+
         if expression.startswith("var"):
             match = re.match(r"^var\s(\w+)\s*=\s*(.*)$", expression)
             if match:
@@ -95,6 +100,7 @@ class Interpreter:
         if result:
             for line in code_block:
                 self.interpret(line)
+
 
 # Пример использования интерпретатора
 if __name__ == "__main__":
