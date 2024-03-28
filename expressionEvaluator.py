@@ -1,6 +1,5 @@
 import re
 
-
 class ExpressionEvaluator:
     def __init__(self, variables=None):
         self.ops = {
@@ -10,8 +9,10 @@ class ExpressionEvaluator:
             '/': (2, lambda a, b: a / b),
             '==': (0, lambda a, b: a == b),  # Оператор сравнения равенства
             '!=': (0, lambda a, b: a != b),  # Оператор сравнения неравенства
-            '>': (0, lambda a, b: a > b),  # Оператор сравнения больше
-            '<': (0, lambda a, b: a < b)  # Оператор сравнения меньше
+            '>': (0, lambda a, b: a > b),    # Оператор сравнения больше
+            '<': (0, lambda a, b: a < b),    # Оператор сравнения меньше
+            '&&': (-1, lambda a, b: a and b),  # Логический оператор И
+            '||': (-1, lambda a, b: a or b)    # Логический оператор ИЛИ
         }
         self.variables = variables if variables is not None else {}
 
@@ -24,8 +25,8 @@ class ExpressionEvaluator:
 
     def evaluate_expression(self, expression):
         expression = re.sub(r'\s+', '', expression)
-        # Обновленная регулярка для корректного разделения новых операторов
-        tokens = re.findall(r'\d+|[+\-*/()]|==|!=|>|<|\b[a-zA-Z]\b', expression)
+        # Обновленная регулярка для корректного разделения всех операторов, включая && и ||
+        tokens = re.findall(r'\d+|[+\-*/()]|==|!=|>|<|&&|\|\||\b[a-zA-Z]\b', expression)
         values = []
         operators = []
 
