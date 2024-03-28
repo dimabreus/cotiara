@@ -7,7 +7,9 @@ class ExpressionEvaluator:
             '-': (1, lambda a, b: a - b),
             '*': (2, lambda a, b: a * b),
             '/': (2, lambda a, b: a / b),
-            '==': (0, lambda a, b: a == b)  # Оператор сравнения
+            '==': (0, lambda a, b: a == b),  # Оператор сравнения равенства
+            '>': (0, lambda a, b: a > b),  # Оператор сравнения больше
+            '<': (0, lambda a, b: a < b)   # Оператор сравнения меньше
         }
         self.variables = variables if variables is not None else {}
 
@@ -20,8 +22,8 @@ class ExpressionEvaluator:
 
     def evaluate_expression(self, expression):
         expression = re.sub(r'\s+', '', expression)
-        # Обновленная регулярка для корректного разделения '=='
-        tokens = re.findall(r'\d+|[+\-*/()]|==|\b[a-zA-Z]\b', expression)
+        # Обновленная регулярка для корректного разделения новых операторов
+        tokens = re.findall(r'\d+|[+\-*/()]|==|>|<|\b[a-zA-Z]\b', expression)
         values = []
         operators = []
 
@@ -29,7 +31,6 @@ class ExpressionEvaluator:
             if token.isdigit():
                 values.append(int(token))
             elif token in self.variables:
-                # Для поддержки логических значений в переменных
                 val = self.variables[token]
                 values.append(val if isinstance(val, bool) else int(val))
             elif token == '(':
@@ -47,6 +48,4 @@ class ExpressionEvaluator:
         while operators:
             self._apply_operator(operators, values)
 
-        # Возвращаемое значение уже может быть логическим из-за оператора '=='
         return values.pop()
-
