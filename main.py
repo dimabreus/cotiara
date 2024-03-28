@@ -1,9 +1,6 @@
 import re
-
 import pyautogui
-
 from expressionEvaluator import ExpressionEvaluator
-
 
 class Interpreter:
     def __init__(self):
@@ -30,7 +27,7 @@ class Interpreter:
             if match:
                 self._press(expression)
             else:
-                raise SyntaxError("Invalid syntax for echo. Expected 'echo <text>'.")
+                raise SyntaxError("Invalid syntax for press. Expected 'press <key>'.")
 
         elif expression.startswith("loop"):
             match = re.match(r"loop (\d+) \{(.*)\}", expression, re.DOTALL)
@@ -38,6 +35,13 @@ class Interpreter:
                 self._loop(expression)
             else:
                 raise SyntaxError("Invalid syntax for loop. Expected 'loop <count> {<code>}'.")
+
+        elif expression.startswith("if"):
+            match = re.match(r"if (.+) \{(.*)\}", expression, re.DOTALL)
+            if match:
+                self._if(expression)
+            else:
+                raise SyntaxError("Invalid syntax for if. Expected 'if <condition> {<code>}'.")
 
         else:
             raise NotImplementedError("This expression type is not supported.")
@@ -52,7 +56,6 @@ class Interpreter:
 
         result = evaluator.evaluate_expression(tokens[1])
 
-        # Присваивание значения переменной
         self.vars[var_name] = result
 
     # Вывод
@@ -73,11 +76,7 @@ class Interpreter:
         pyautogui.press(button)
 
     def _loop(self, expression):
-        # Разбор выражения цикла и выполнение блока кода
         match = re.match(r"loop (\d+) \{(.*)\}", expression, re.DOTALL)
-        if not match:
-            raise SyntaxError("Invalid syntax for loop. Expected 'loop <count> {<code>}'.")
-
         count = int(match.group(1))
         code_block = match.group(2).strip().splitlines()
 
@@ -85,38 +84,55 @@ class Interpreter:
             for line in code_block:
                 self.interpret(line)
 
+    def _if(self, expression):
+        match = re.match(r"if (.+) \{(.*)\}", expression, re.DOTALL)
+        condition = match.group(1)
+        code_block = match.group(2).strip().splitlines()
+
+        evaluator = ExpressionEvaluator(self.vars)
+        result = evaluator.evaluate_expression(condition)
+
+        if result:
+            for line in code_block:
+                self.interpret(line)
 
 # Пример использования интерпретатора
 if __name__ == "__main__":
     interpreter = Interpreter()
     multiline_command = ""  # Для хранения многострочных команд
-    inside_loop = False  # Флаг, указывающий на то, что мы внутри блока loop
+    inside_multi_line = False  # Флаг, указывающий на то, что мы внутри блока loop или if
+    multi_line_type = None  # Тип многострочного блока: loop или if
 
     while True:
         try:
             # Если мы не внутри многострочной команды, читаем новую строку
-            if not inside_loop:
+            if not inside_multi_line:
                 expression = input(">> ")
             else:
                 # Добавляем строки к многострочной команде
                 expression = input(".. ")
                 multiline_command += "\n" + expression
 
-            # Проверяем, начинается ли строка с loop и устанавливаем флаг
-            if expression.startswith("loop") and not inside_loop:
-                inside_loop = True
+            # Проверяем, начинается ли строка с loop или if и устанавливаем флаги
+            if (expression.startswith("loop") or expression.startswith("if")) and not inside_multi_line:
+                inside_multi_line = True
+                multi_line_type = "loop" if expression.startswith("loop") else "if"
                 multiline_command = expression
                 continue  # Пропускаем дальнейшую обработку и ждем следующий ввод
 
             # Если мы находим закрывающую скобку, обрабатываем многострочную команду
-            if inside_loop and expression.rstrip().endswith("}"):
-                inside_loop = False
-                interpreter.interpret(multiline_command)
+            if inside_multi_line and expression.rstrip().endswith("}"):
+                inside_multi_line = False
+                if multi_line_type == "if":
+                    interpreter.interpret(multiline_command)  # Обработка if
+                elif multi_line_type == "loop":
+                    interpreter.interpret(multiline_command)  # Обработка loop
                 multiline_command = ""  # Сбрасываем многострочную команду
+                multi_line_type = None  # Сбрасываем тип многострочного блока
                 continue  # Пропускаем дальнейшую обработку и ждем следующий ввод
 
             # Обычная обработка команды, если мы не в многострочном режиме
-            if not inside_loop:
+            if not inside_multi_line:
                 interpreter.interpret(expression)
                 print(interpreter.vars)
 
