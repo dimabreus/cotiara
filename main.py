@@ -27,13 +27,6 @@ class Interpreter:
             else:
                 raise SyntaxError("Invalid syntax for echo. Expected 'echo <text>'.")
 
-        elif expression.startswith("press"):
-            match = re.match(r"^press .+$", expression)
-            if match:
-                self._press(expression)
-            else:
-                raise SyntaxError("Invalid syntax for press. Expected 'press <key>'.")
-
         elif expression.startswith("loop"):
             match = re.match(r"loop (\d+) \{(.*)\}", expression, re.DOTALL)
             if match:
@@ -47,6 +40,34 @@ class Interpreter:
                 self._if(expression)
             else:
                 raise SyntaxError("Invalid syntax for if. Expected 'if <condition> {<code>}'.")
+
+        elif expression.startswith("press"):
+            match = re.match(r"^press .+$", expression)
+            if match:
+                self._press(expression)
+            else:
+                raise SyntaxError("Invalid syntax for press. Expected 'press <key>'.")
+
+        elif expression.startswith("move"):
+            match = re.match(r"^move \d+ \d+$", expression)
+            if match:
+                self._move(expression)
+            else:
+                raise SyntaxError("Invalid syntax for move. Expected 'move <x> <y>'.")
+
+        elif expression.startswith("leftClick"):
+            match = re.match(r"^leftClick \d+ \d+$", expression)
+            if match:
+                self._leftClick(expression)
+            else:
+                raise SyntaxError("Invalid syntax for move. Expected 'leftClick <x> <y>'.")
+
+        elif expression.startswith("rightClick"):
+            match = re.match(r"^rightClick \d+ \d+$", expression)
+            if match:
+                self._rightClick(expression)
+            else:
+                raise SyntaxError("Invalid syntax for move. Expected 'rightClick <x> <y>'.")
 
         else:
             raise NotImplementedError("This expression type is not supported.")
@@ -72,14 +93,6 @@ class Interpreter:
 
         print(output)
 
-    # Нажатие на клавишу
-    def _press(self, expression):
-        button = re.match(r"^press (.*)$", expression).group(1)
-
-        for var_name, var_value in self.vars.items():
-            button = button.replace(f"%{var_name}%", str(var_value))
-        pyautogui.press(button)
-
     def _loop(self, expression):
         match = re.match(r"loop (\d+) \{(.*)\}", expression, re.DOTALL)
         count = int(match.group(1))
@@ -100,6 +113,41 @@ class Interpreter:
         if result:
             for line in code_block:
                 self.interpret(line)
+
+    # Нажатие на клавишу
+    def _press(self, expression):
+        button = re.match(r"^press (.*)$", expression).group(1)
+
+        for var_name, var_value in self.vars.items():
+            button = button.replace(f"%{var_name}%", str(var_value))
+        pyautogui.press(button)
+
+    # Перемещение курсора
+    def _move(self, expression):
+        for var_name, var_value in self.vars.items():
+            expression = expression.replace(f"%{var_name}%", str(var_value))
+
+        x, y = re.match(r"^move (\d+) (\d+)$", expression).groups()
+
+        pyautogui.moveTo(int(x), int(y))
+
+    def _leftClick(self, expression):
+        for var_name, var_value in self.vars.items():
+            expression = expression.replace(f"%{var_name}%", str(var_value))
+
+        x, y = re.match(r"^leftClick (\d+) (\d+)$", expression).groups()
+
+        pyautogui.leftClick(int(x), int(y))
+
+    def _rightClick(self, expression):
+        for var_name, var_value in self.vars.items():
+            expression = expression.replace(f"%{var_name}%", str(var_value))
+
+        print(expression)
+
+        x, y = re.match(r"^rightClick (\d+) (\d+)$", expression).groups()
+
+        pyautogui.rightClick(int(x), int(y))
 
 
 # Пример использования интерпретатора
