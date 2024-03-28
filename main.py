@@ -92,7 +92,7 @@ class Interpreter:
 
         else:
             raise NotImplementedError("This expression type is not supported.")
-
+    # Создание переменной
     def _create_var(self, expression):
         tokens = re.match(r"var\s(\w+)\s*=\s*(.*)", expression).groups()
 
@@ -104,7 +104,7 @@ class Interpreter:
 
         # Присваивание значения переменной
         self.vars[var_name] = result
-
+    # Вывод
     def _echo(self, expression):
         output = re.match(r"^echo (.*)$", expression).group(1)
 
@@ -112,7 +112,7 @@ class Interpreter:
             output = output.replace(f"%{var_name}%", str(var_value))
 
         print(output)
-
+    # Нажатие на клавишу
     def _press(self, expression):
         button = re.match(r"^press (.*)$", expression).group(1)
 
