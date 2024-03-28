@@ -1,7 +1,8 @@
-var i = 0
-
-loop 5 {
-    var i = %i% + 1
-
-    echo i: %i%
+loop 2 {
+    var i = 0
+    
+    loop 5 {
+        var i = %i% + 1
+        echo %i%
+    }
 }

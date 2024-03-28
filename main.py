@@ -2,75 +2,46 @@ import re
 
 import pyautogui
 
+from commands import commands
 from expressionEvaluator import ExpressionEvaluator
 
 
 class Interpreter:
     def __init__(self):
         self.vars = {}  # Словарь для хранения переменных
+        self.evaluator = ExpressionEvaluator(self.vars)
 
     # Метод для интерпретации выражения
-    def interpret(self, expression):
-        expression = re.sub(r"/\*.*?\*/", "", expression, flags=re.DOTALL)
+    def interpret(self, expressions):
+        for expression in expressions:
+            expression = re.sub(r"/\*.*?\*/", "", expression, flags=re.DOTALL)
 
-        if expression.startswith("var"):
-            match = re.match(r"^var\s(\w+)\s*=\s*(.*)$", expression)
-            if match:
-                self._create_var(expression)
-            else:
-                raise SyntaxError("Invalid syntax for variable declaration. Expected 'var variable_name = value'.")
+            for var_name, var_value in self.vars.items():
+                expression = expression.replace(f"%{var_name}%", str(var_value))
 
-        elif expression.startswith("echo"):
-            match = re.match(r"^echo .+$", expression)
-            if match:
-                self._echo(expression)
-            else:
-                raise SyntaxError("Invalid syntax for echo. Expected 'echo <text>'.")
+            if not expression:
+                continue
 
-        elif expression.startswith("loop"):
-            match = re.match(r"loop (\d+) \{(.*)\}", expression, re.DOTALL)
-            if match:
-                self._loop(expression)
-            else:
-                raise SyntaxError("Invalid syntax for loop. Expected 'loop <count> {<code>}'.")
+            matched = False
 
-        elif expression.startswith("if"):
-            match = re.match(r"if (.+) \{(.*)\}", expression, re.DOTALL)
-            if match:
-                self._if(expression)
-            else:
-                raise SyntaxError("Invalid syntax for if. Expected 'if <condition> {<code>}'.")
+            for command in commands:
+                if expression.startswith(command["name"]):
+                    if "flags" in command.keys():
+                        match = re.match(command["regular"], expression, flags=command["flags"])
+                    else:
+                        match = re.match(command["regular"], expression)
+                    if match:
+                        matched = True
+                        if command["parameters"] == 1:
+                            getattr(self, command["method"])(expression)
+                        else:
+                            getattr(self, command["method"])(expression, expressions)
+                        break
+                    else:
+                        raise SyntaxError(f"Invalid syntax for {command['name']}. Expected '{command['syntax']}'.")
 
-        elif expression.startswith("press"):
-            match = re.match(r"^press .+$", expression)
-            if match:
-                self._press(expression)
-            else:
-                raise SyntaxError("Invalid syntax for press. Expected 'press <key>'.")
-
-        elif expression.startswith("move"):
-            match = re.match(r"^move \d+ \d+$", expression)
-            if match:
-                self._move(expression)
-            else:
-                raise SyntaxError("Invalid syntax for move. Expected 'move <x> <y>'.")
-
-        elif expression.startswith("leftClick"):
-            match = re.match(r"^leftClick \d+ \d+$", expression)
-            if match:
-                self._leftClick(expression)
-            else:
-                raise SyntaxError("Invalid syntax for move. Expected 'leftClick <x> <y>'.")
-
-        elif expression.startswith("rightClick"):
-            match = re.match(r"^rightClick \d+ \d+$", expression)
-            if match:
-                self._rightClick(expression)
-            else:
-                raise SyntaxError("Invalid syntax for move. Expected 'rightClick <x> <y>'.")
-
-        else:
-            raise NotImplementedError("This expression type is not supported.")
+            if not matched:
+                raise NotImplementedError("This expression type is not supported.")
 
     # Создание переменной
     def _create_var(self, expression):
@@ -93,26 +64,32 @@ class Interpreter:
 
         print(output)
 
-    def _loop(self, expression):
-        match = re.match(r"loop (\d+) \{(.*)\}", expression, re.DOTALL)
-        count = int(match.group(1))
-        code_block = match.group(2).strip().splitlines()
+    def _start_loop(self, expression, all_expressions):
+        times = int(re.match(r"loop (\d+)", expression).group(1))
+        block_expressions = self._collect_block(all_expressions)
+        for _ in range(times):
+            self.interpret(iter(block_expressions))
 
-        for _ in range(count):
-            for line in code_block:
-                self.interpret(line)
+    def _start_if(self, expression, all_expressions):
+        condition = re.match(r"if (.+)", expression).group(1)
+        block_expressions = self._collect_block(all_expressions)
+        condition_result = self.evaluator.evaluate_expression(condition)
+        if condition_result:
+            self.interpret(iter(block_expressions))
 
-    def _if(self, expression):
-        match = re.match(r"if (.+) \{(.*)\}", expression, re.DOTALL)
-        condition = match.group(1)
-        code_block = match.group(2).strip().splitlines()
-
-        evaluator = ExpressionEvaluator(self.vars)
-        result = evaluator.evaluate_expression(condition)
-
-        if result:
-            for line in code_block:
-                self.interpret(line)
+    @staticmethod
+    def _collect_block(all_expressions):
+        block_expressions = []
+        depth = 1
+        while depth != 0:
+            expression = next(all_expressions).strip()
+            if expression.startswith(("loop", "if")):
+                depth += 1
+            elif expression == "}":
+                depth -= 1
+            if depth > 0:
+                block_expressions.append(expression)
+        return block_expressions
 
     # Нажатие на клавишу
     def _press(self, expression):
@@ -131,7 +108,7 @@ class Interpreter:
 
         pyautogui.moveTo(int(x), int(y))
 
-    def _leftClick(self, expression):
+    def _lef_click(self, expression):
         for var_name, var_value in self.vars.items():
             expression = expression.replace(f"%{var_name}%", str(var_value))
 
@@ -139,7 +116,7 @@ class Interpreter:
 
         pyautogui.leftClick(int(x), int(y))
 
-    def _rightClick(self, expression):
+    def _right_click(self, expression):
         for var_name, var_value in self.vars.items():
             expression = expression.replace(f"%{var_name}%", str(var_value))
 
@@ -150,44 +127,9 @@ class Interpreter:
         pyautogui.rightClick(int(x), int(y))
 
 
-
-
 if __name__ == "__main__":
     interpreter = Interpreter()
-    multiline_command = ""  # Для хранения многострочных команд
-    inside_multi_line = False  # Флаг, указывающий на то, что мы внутри блока loop или if
-    multi_line_type = None  # Тип многострочного блока: loop или if
+    with open("code.cot", "r", encoding="utf8") as file:
+        code = [line.strip() for line in file]
 
-    with open("code.cot", "r") as file:  # Открываем файл для чтения
-        for line in file:  # Читаем файл построчно
-            expression = line.strip()  # Убираем пробельные символы с начала и конца строки
-
-            if not expression:  # Пропускаем пустые строки
-                continue
-
-            # Проверяем, начинается ли строка с loop или if и устанавливаем флаги
-            if (expression.startswith("loop") or expression.startswith("if")) and not inside_multi_line:
-                inside_multi_line = True
-                multi_line_type = "loop" if expression.startswith("loop") else "if"
-                multiline_command = expression
-                continue  # Пропускаем дальнейшую обработку и ждем следующий ввод
-
-            if inside_multi_line:
-                # Добавляем строки к многострочной команде
-                multiline_command += "\n" + expression
-
-            # Если мы находим закрывающую скобку, обрабатываем многострочную команду
-            if inside_multi_line and expression.rstrip().endswith("}"):
-                inside_multi_line = False
-                if multi_line_type == "if":
-                    interpreter.interpret(multiline_command)  # Обработка if
-                elif multi_line_type == "loop":
-                    interpreter.interpret(multiline_command)  # Обработка loop
-                multiline_command = ""  # Сбрасываем многострочную команду
-                multi_line_type = None  # Сбрасываем тип многострочного блока
-                continue  # Пропускаем дальнейшую обработку
-
-            # Обычная обработка команды, если мы не в многострочном режиме
-            if not inside_multi_line:
-                interpreter.interpret(expression)
-                print(interpreter.vars)
+    interpreter.interpret(iter(code))
