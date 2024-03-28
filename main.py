@@ -108,7 +108,7 @@ class Interpreter:
 
         pyautogui.moveTo(int(x), int(y))
 
-    def _lef_click(self, expression):
+    def _left_click(self, expression):
         for var_name, var_value in self.vars.items():
             expression = expression.replace(f"%{var_name}%", str(var_value))
 
