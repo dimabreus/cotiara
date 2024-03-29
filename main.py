@@ -1,7 +1,7 @@
 import re
 
 import pyautogui
-
+import sys
 from commands import commands
 from expressionEvaluator import ExpressionEvaluator
 
@@ -129,7 +129,7 @@ class Interpreter:
         pyautogui.rightClick(int(x), int(y))
 
 
-FILENAME = "code.cot"
+FILENAME = "".join(sys.argv[1:2]) or "code.cot"
 
 if __name__ == "__main__":
     interpreter = Interpreter()
