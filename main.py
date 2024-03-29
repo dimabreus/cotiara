@@ -78,7 +78,8 @@ class Interpreter:
         else:
             raise ValueError(f"Function {func_name} is not defined.")
 
-    def _collect_block(self, all_expressions):
+    @staticmethod
+    def _collect_block(all_expressions):
         block_expressions = []
         depth = 1
         while depth != 0:
@@ -158,7 +159,7 @@ class Interpreter:
 
     def listen_for_key_events(self):
         if 'on_press' in self.functions:
-            def on_event(event, state):
+            def on_event(event):
                 try:
                     if event.event_type in ['down', 'up']:  # Проверяем тип события: нажатие или отпускание
                         state = 0 if event.event_type == 'down' else 1
@@ -170,7 +171,7 @@ class Interpreter:
                 except Exception as e:
                     print(f"Error during key event handling: {e}")
 
-            keyboard.hook(lambda event: on_event(event, state=0))
+            keyboard.hook(lambda event: on_event(event))
 
 
 FILENAME = "".join(sys.argv[1:2]) or "code.cot"
