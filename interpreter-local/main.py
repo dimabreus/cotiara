@@ -6,21 +6,15 @@ import pyautogui
 
 from commands import commands
 from expressionEvaluator import ExpressionEvaluator
+from function import Function
 
 pyautogui.FAILSAFE = False
-
-
-class Function:
-    def __init__(self, name, parameters, expressions):
-        self.name = name
-        self.parameters = parameters
-        self.expressions = expressions
 
 
 class Interpreter:
     def __init__(self):
         self.vars = {}
-        self.functions = {}  # Словарь для хранения функций
+        self.functions = {}
         self.evaluator = ExpressionEvaluator(self.vars)
 
     def interpret(self, expressions):
@@ -70,10 +64,8 @@ class Interpreter:
                 raise ValueError(
                     f"Function {func_name} expects {len(function.parameters)} arguments, {len(args)} provided.")
             else:
-                # Заменяем параметры функции на переданные аргументы
                 for param, arg in zip(function.parameters, args):
                     self.vars[param] = arg
-                # Интерпретируем выражения внутри функции
                 self.interpret(iter(function.expressions))
         else:
             raise ValueError(f"Function {func_name} is not defined.")
@@ -159,12 +151,12 @@ class Interpreter:
 
     def listen_for_key_events(self):
         if 'on_press' in self.functions:
+
             def on_event(event):
                 try:
-                    if event.event_type in ['down', 'up']:  # Проверяем тип события: нажатие или отпускание
+                    if event.event_type in ['down', 'up']:
                         state = 0 if event.event_type == 'down' else 1
                         function = self.functions['on_press']
-                        # Первым аргументом передаем состояние клавиши, вторым - код клавиши
                         self.vars[function.parameters[0]] = state
                         self.vars[function.parameters[1]] = event.scan_code
                         self.interpret(iter(function.expressions))
@@ -174,14 +166,22 @@ class Interpreter:
             keyboard.hook(lambda event: on_event(event))
 
 
-FILENAME = "".join(sys.argv[1:2]) or "code.cot"
-
 if __name__ == "__main__":
+    argv = sys.argv[1:]
+
+    if not argv:
+        print("Error: No file path provided. Please specify the path to the file you wish to process.\n"
+              "Syntax: python main.py \"path/to/your/file\"")
+        quit()
+
+    filename = argv[0]
+
     interpreter = Interpreter()
-    with open(FILENAME, "r", encoding="utf8") as file:
+    with open(filename, "r", encoding="utf8") as file:
         code = [line.strip() for line in file]
         code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
 
     interpreter.interpret(iter(code))
-    interpreter.listen_for_key_events()  # Вызов метода для начала отслеживания нажатий клавиш
-    keyboard.wait('esc')
+    if 'on_press' in interpreter.functions:
+        interpreter.listen_for_key_events()
+        keyboard.wait('esc')

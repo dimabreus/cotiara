@@ -1,5 +1,0 @@
-func on_press(rel,key){
-echo %key%
-echo key
-}
-
