@@ -129,9 +129,12 @@ class Interpreter:
         pyautogui.rightClick(int(x), int(y))
 
 
+FILENAME = "code.cot"
+
 if __name__ == "__main__":
     interpreter = Interpreter()
-    with open("code2.cot", "r", encoding="utf8") as file:
+    with open(FILENAME, "r", encoding="utf8") as file:
         code = [line.strip() for line in file]
+        code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
 
     interpreter.interpret(iter(code))
