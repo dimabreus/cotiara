@@ -1,23 +1,29 @@
 import re
+import sys
 
 import pyautogui
-import sys
+
 from commands import commands
 from expressionEvaluator import ExpressionEvaluator
 
 pyautogui.FAILSAFE = False
 
 
+class Function:
+    def __init__(self, name, parameters, expressions):
+        self.name = name
+        self.parameters = parameters
+        self.expressions = expressions
+
+
 class Interpreter:
     def __init__(self):
-        self.vars = {}  # Словарь для хранения переменных
+        self.vars = {}
+        self.functions = {}  # Словарь для хранения функций
         self.evaluator = ExpressionEvaluator(self.vars)
 
-    # Метод для интерпретации выражения
     def interpret(self, expressions):
         for expression in expressions:
-            expression = re.sub(r"/\*.*?\*/", "", expression, flags=re.DOTALL)
-
             for var_name, var_value in self.vars.items():
                 expression = expression.replace(f"%{var_name}%", str(var_value))
 
@@ -43,9 +49,52 @@ class Interpreter:
                         raise SyntaxError(f"Invalid syntax for {command['name']}. Expected '{command['syntax']}'.")
 
             if not matched:
-                raise NotImplementedError("This expression type is not supported.")
+                if expression.startswith("func"):
+                    self._define_function(expression, expressions)
+                elif expression.startswith("call"):
+                    self._call_function(expression)
+                else:
+                    raise NotImplementedError("This expression type is not supported.")
 
-    # Создание переменной
+    def _define_function(self, expression, all_expressions):
+        func_declaration = re.match(r"func\s(\w+)\s*\((.*)\)\s*{", expression)
+        func_name = func_declaration.group(1)
+        parameters = [param.strip() for param in func_declaration.group(2).split(",")]
+        block_expressions = self._collect_block(all_expressions)
+        function = Function(func_name, parameters, block_expressions)
+        self.functions[func_name] = function
+
+    def _call_function(self, expression):
+        func_call = re.match(r"call\s(\w+)\s*\((.*)\)", expression)
+        func_name = func_call.group(1)
+        args = [arg.strip() for arg in func_call.group(2).split(",")]
+        if func_name in self.functions:
+            function = self.functions[func_name]
+            if len(args) != len(function.parameters):
+                raise ValueError(
+                    f"Function {func_name} expects {len(function.parameters)} arguments, {len(args)} provided.")
+            else:
+                # Заменяем параметры функции на переданные аргументы
+                for param, arg in zip(function.parameters, args):
+                    self.vars[param] = arg
+                # Интерпретируем выражения внутри функции
+                self.interpret(iter(function.expressions))
+        else:
+            raise ValueError(f"Function {func_name} is not defined.")
+
+    def _collect_block(self, all_expressions):
+        block_expressions = []
+        depth = 1
+        while depth != 0:
+            expression = next(all_expressions).strip()
+            if expression.startswith(("loop", "if", "func")):
+                depth += 1
+            elif expression == "}":
+                depth -= 1
+            if depth > 0:
+                block_expressions.append(expression)
+        return block_expressions
+
     def _create_var(self, expression):
         tokens = re.match(r"var\s(\w+)\s*=\s*(.*)", expression).groups()
 
@@ -57,7 +106,6 @@ class Interpreter:
 
         self.vars[var_name] = result
 
-    # Вывод
     def _echo(self, expression):
         output = re.match(r"^echo (.*)$", expression).group(1)
 
@@ -79,21 +127,6 @@ class Interpreter:
         if condition_result:
             self.interpret(iter(block_expressions))
 
-    @staticmethod
-    def _collect_block(all_expressions):
-        block_expressions = []
-        depth = 1
-        while depth != 0:
-            expression = next(all_expressions).strip()
-            if expression.startswith(("loop", "if")):
-                depth += 1
-            elif expression == "}":
-                depth -= 1
-            if depth > 0:
-                block_expressions.append(expression)
-        return block_expressions
-
-    # Нажатие на клавишу
     def _press(self, expression):
         button = re.match(r"^press (.*)$", expression).group(1)
 
@@ -101,7 +134,6 @@ class Interpreter:
             button = button.replace(f"%{var_name}%", str(var_value))
         pyautogui.press(button)
 
-    # Перемещение курсора
     def _move(self, expression):
         for var_name, var_value in self.vars.items():
             expression = expression.replace(f"%{var_name}%", str(var_value))

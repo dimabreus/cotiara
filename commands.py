@@ -59,4 +59,18 @@ commands = [
         "method": "_right_click",
         "parameters": 1
     },
+    {
+        "name": "func",
+        "regular": r"^func\s+\w+\s*\([^)]*\)\s*{",
+        "syntax": "func <function_name>(<parameters>) {...}",
+        "method": "_define_function",
+        "parameters": 2
+    },
+    {
+        "name": "call",
+        "regular": r"^call\s+\w+\s*\([^)]*\)",
+        "syntax": "call <function_name>(<arguments>)",
+        "method": "_call_function",
+        "parameters": 1
+    }
 ]

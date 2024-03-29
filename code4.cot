@@ -1,0 +1,3 @@
+func on_press(key) {
+    echo a
+}

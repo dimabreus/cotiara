@@ -1,0 +1,7 @@
+func aboba (a, b) {
+    var aboba_c = %a% + %b%
+}
+
+call aboba(2, 2)
+
+echo %aboba_c%
