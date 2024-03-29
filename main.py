@@ -49,12 +49,7 @@ class Interpreter:
                         raise SyntaxError(f"Invalid syntax for {command['name']}. Expected '{command['syntax']}'.")
 
             if not matched:
-                if expression.startswith("func"):
-                    self._define_function(expression, expressions)
-                elif expression.startswith("call"):
-                    self._call_function(expression)
-                else:
-                    raise NotImplementedError("This expression type is not supported.")
+                raise NotImplementedError("This expression type is not supported.")
 
     def _define_function(self, expression, all_expressions):
         func_declaration = re.match(r"func\s(\w+)\s*\((.*)\)\s*{", expression)
