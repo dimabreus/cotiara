@@ -1,0 +1,8 @@
+var x = 0
+var y = 0
+
+loop 50 {
+    var x = %x% + 1
+    var y = %y% + 1
+    move %x% %y%
+}

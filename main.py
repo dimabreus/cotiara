@@ -5,6 +5,8 @@ import pyautogui
 from commands import commands
 from expressionEvaluator import ExpressionEvaluator
 
+pyautogui.FAILSAFE = False
+
 
 class Interpreter:
     def __init__(self):
@@ -129,7 +131,7 @@ class Interpreter:
 
 if __name__ == "__main__":
     interpreter = Interpreter()
-    with open("code.cot", "r", encoding="utf8") as file:
+    with open("code2.cot", "r", encoding="utf8") as file:
         code = [line.strip() for line in file]
 
     interpreter.interpret(iter(code))
