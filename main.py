@@ -1,6 +1,7 @@
 import re
 import sys
 
+import keyboard
 import pyautogui
 
 from commands import commands
@@ -155,6 +156,48 @@ class Interpreter:
 
         pyautogui.rightClick(int(x), int(y))
 
+    def listen_for_key_events(self):
+        if 'on_press' in self.functions:
+            def on_event(event, state):
+                try:
+                    if event.event_type in ['down', 'up']:  # Проверяем тип события: нажатие или отпускание
+                        state = 0 if event.event_type == 'down' else 1
+                        function = self.functions['on_press']
+                        # Первым аргументом передаем состояние клавиши, вторым - код клавиши
+                        self.vars[function.parameters[0]] = state
+                        self.vars[function.parameters[1]] = event.scan_code
+                        self.interpret(iter(function.expressions))
+                except Exception as e:
+                    print(f"Error during key event handling: {e}")
+
+            keyboard.hook(lambda event: on_event(event, state=0))
+
+    def invoke_key_function(self, state, event):
+        try:
+            function = self.functions['on_press']
+            # Подготавливаем аргументы: состояние клавиши и код клавиши
+            args = [state, event.scan_code]
+            # Убедимся, что количество параметров соответствует ожидаемому
+            if len(function.parameters) == len(args):
+                for param, arg in zip(function.parameters, args):
+                    self.vars[param] = arg
+                self.interpret(iter(function.expressions))
+            else:
+                raise ValueError(
+                    f"Function 'on_press' expects {len(function.parameters)} arguments, {len(args)} provided.")
+        except Exception as e:
+            print(f"Error during key event handling: {e}")
+
+    def handle_key_event(self, event, state):
+        try:
+            function = self.functions['on_press']
+            # Первым аргументом передаём состояние клавиши, вторым - код клавиши
+            self.vars[function.parameters[0]] = state
+            self.vars[function.parameters[1]] = event.scan_code
+            self.interpret(iter(function.expressions))
+        except Exception as e:
+            print(f"Error during key event handling: {e}")
+
 
 FILENAME = "".join(sys.argv[1:2]) or "code.cot"
 
@@ -165,3 +208,5 @@ if __name__ == "__main__":
         code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
 
     interpreter.interpret(iter(code))
+    interpreter.listen_for_key_events()  # Вызов метода для начала отслеживания нажатий клавиш
+    keyboard.wait('esc')
