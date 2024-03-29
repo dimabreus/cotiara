@@ -1,15 +1,5 @@
-func aboba () {
-    press a
-    press b
-    press o
-    press b
-    press a
+func on_press(rel,key){
+echo %key%
+echo key
 }
 
-var alt_press = 0
-
-func handle_key(rel, key) {
-    if %key% == 44 && %rel% == 1 {
-        call aboba()
-    }
-}

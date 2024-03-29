@@ -1,7 +1,6 @@
-func aboba (a, b) {
-    var aboba_c = %a% + %b%
+func aboba(a, b) {
+    var c = %a% + %b%
+    echo %c%
 }
 
 call aboba(2, 2)
-
-echo %aboba_c%

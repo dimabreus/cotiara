@@ -172,32 +172,6 @@ class Interpreter:
 
             keyboard.hook(lambda event: on_event(event, state=0))
 
-    def invoke_key_function(self, state, event):
-        try:
-            function = self.functions['on_press']
-            # Подготавливаем аргументы: состояние клавиши и код клавиши
-            args = [state, event.scan_code]
-            # Убедимся, что количество параметров соответствует ожидаемому
-            if len(function.parameters) == len(args):
-                for param, arg in zip(function.parameters, args):
-                    self.vars[param] = arg
-                self.interpret(iter(function.expressions))
-            else:
-                raise ValueError(
-                    f"Function 'on_press' expects {len(function.parameters)} arguments, {len(args)} provided.")
-        except Exception as e:
-            print(f"Error during key event handling: {e}")
-
-    def handle_key_event(self, event, state):
-        try:
-            function = self.functions['on_press']
-            # Первым аргументом передаём состояние клавиши, вторым - код клавиши
-            self.vars[function.parameters[0]] = state
-            self.vars[function.parameters[1]] = event.scan_code
-            self.interpret(iter(function.expressions))
-        except Exception as e:
-            print(f"Error during key event handling: {e}")
-
 
 FILENAME = "".join(sys.argv[1:2]) or "code.cot"
 
