@@ -1,4 +1,4 @@
-console.log('executing maexpressionEvaluatorin.js')
+console.log('executing expressionEvaluator.js')
 class ExpressionEvaluator {
     constructor(variables = {}) {
         this.ops = {

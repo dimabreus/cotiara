@@ -1,4 +1,4 @@
-console.log('function main.js')
+console.log('executing scriptFunction.js')
 class ScriptFunction {
     constructor(name, parameters, expressions) {
         this.name = name;
