@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotiara Online Interpreter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css"> <!-- codemirror css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/theme/monokai.min.css"> <!-- codemirror theme css -->
+    <link rel="stylesheet" href="style.css"> <!-- css -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js"></script> <!-- codemirror main js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/addon/mode/simple.min.js"></script> <!-- codemirror help main js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/addon/edit/closebrackets.min.js"></script> <!-- codemirror closebrackets js -->
+    
+    <script type="module" src="interpreter/main.js"></script> <!-- interpreter js -->
+    <script src="cotiaraMode.js"></script> <!-- codemirror mode js -->
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Cotiara Online Interpreter</h1>
+        </header>
+        <main>
+            <textarea id="codeInput" placeholder="Введите ваш код на Cotiara здесь..."></textarea>
+            <button id="runBtn">Выполнить</button>
+            <button id="formatBtn">Форматировать код</button>
+
+            <div id="output"></div>
+            <div id="debugLogs" class="debug-logs"></div>
+
+        </main>
+        <footer>
+            <p>Разработано для Cotiara</p>
+            <a href="https://github.com/dimabreus/cotiara" target="_blank">GitHub</a> |
+            <a href="https://pypi.org/project/cotiara/" target="_blank">PyPI</a>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
