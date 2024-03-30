@@ -1,0 +1,97 @@
+:root {
+    --background-color: #121212;
+    --text-color: #E0E0E0;
+    --accent-color: #BB86FC;
+    --accent-hover-color: #9A67EA;
+    --box-background-color: #222;
+    --border-color: #333;
+    --button-background-color: #333;
+    --button-hover-color: #444;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 18px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--box-background-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    border-radius: 8px;
+}
+
+header, footer {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: calc(100% - 20px);
+    height: 150px;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+    border-color: var(--accent-color);
+}
+
+button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 0 10px 20px 10px;
+    background-color: var(--button-background-color);
+    color: var(--text-color);
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--button-hover-color);
+}
+
+#output {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: var(--box-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.debug-logs {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #222; /* Чуть темнее, чем основной вывод, для различия */
+    border: 1px solid #333;
+    color: #ff6a00; /* Оранжевый цвет текста для дебаг логов */
+    border-radius: 4px;
+    min-height: 50px; /* Установите минимальную высоту, чтобы консоль была видна даже без логов */
+    overflow: auto; /* При необходимости добавляется прокрутка */
+}
+
+
+footer a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--accent-hover-color);
+    text-decoration: underline;
+}
