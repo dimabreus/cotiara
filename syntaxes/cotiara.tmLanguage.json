@@ -1,0 +1,90 @@
+{
+    "scopeName": "source.cotiara",
+    "patterns": [
+        {
+            "begin": "/\\*\\*(?!/)",
+            "captures": {
+                "0": {
+                    "name": "punctuation.definition.comment.json"
+                }
+            },
+            "end": "\\*/",
+            "name": "comment.block.documentation.json"
+        },
+        {
+            "begin": "/\\*",
+            "captures": {
+                "0": {
+                    "name": "punctuation.definition.comment.json"
+                }
+            },
+            "end": "\\*/",
+            "name": "comment.block.json"
+        },
+        {
+            "captures": {
+                "1": {
+                    "name": "punctuation.definition.comment.json"
+                }
+            },
+            "match": "(//).*$\\n?",
+            "name": "comment.line.double-slash.js"
+        },
+        {
+            "match": "\\b(var|loop|if|move|leftClick|rightClick|press|func|call)\\b",
+            "name": "keyword.control.cotiara"
+        },
+        {
+            "match": "\\b[0-9]+\\b",
+            "name": "constant.numeric.cotiara"
+        },
+        {
+            "match": "(==|!=|>|<|>=|<=|\\+|-|\\*|\\/|&&|\\|\\|)",
+            "name": "keyword.operator.cotiara"
+        },
+        {
+            "match": "%[a-zA-Z_][a-zA-Z0-9_]*%",
+            "name": "variable.parameter.cotiara"
+        },
+        {
+            "begin": "\\bfunc\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+            "beginCaptures": {
+                "1": {
+                    "name": "entity.name.function.cotiara"
+                }
+            },
+            "end": "\\)\\s*\\{",
+            "name": "meta.function.cotiara",
+            "patterns": [
+                {
+                    "match": "([a-zA-Z_][a-zA-Z0-9_]*)",
+                    "name": "variable.parameter.function.cotiara"
+                }
+            ]
+        },
+        {
+            "match": "\\bcall\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+            "name": "keyword.other.call.cotiara",
+            "captures": {
+                "1": {
+                    "name": "entity.name.function.call.cotiara"
+                }
+            }
+        },
+        {
+            "match": "\\b(echo)\\b",
+            "name": "keyword.other.echo.cotiara"
+        },
+        {
+            "match": "\\)",
+            "name": "punctuation.separator.parameter.cotiara"
+        },
+        {
+            "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+            "name": "variable.other.cotiara"
+        }
+    ],
+    "fileTypes": [
+        "cot"
+    ]
+}

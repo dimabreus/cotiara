@@ -1,0 +1,83 @@
+{
+  "name": "cotiara",
+  "displayName": "Cotiara",
+  "publisher": "dimabreus",
+  "description": "Formatter and syntax highlighting for Cotiara",
+  "version": "0.0.2",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.87.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Cotiara Settings",
+      "properties": {
+        "cotiara.useLocalInterpreter": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Use a local interpreter"
+        },
+        "cotiara.pathToInterpreter": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the Local Python interpreter. Only if use a local interpreter enabled"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "cotiara.runFile",
+        "title": "Run Cotiara File",
+        "icon": "$(play)"
+      }
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "when": "resourceLangId == cotiara",
+          "command": "cotiara.runFile",
+          "group": "navigation"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "cotiara",
+        "aliases": [
+          "Cotiara"
+        ],
+        "extensions": [
+          ".cot"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "cotiara",
+        "scopeName": "source.cotiara",
+        "path": "./syntaxes/cotiara.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.87.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.9"
+  }
+}
