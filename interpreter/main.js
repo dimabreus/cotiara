@@ -22,8 +22,10 @@ class Interpreter {
         for (let expression of expressions) {
             this.debug_echo(`in progress expression ${expression}`)
             for (const [varName, varValue] of Object.entries(this.vars)) {
-                this.debug_echo(`%${varName}% has been replaced by ${varValue}`)
-                expression = expression.replaceAll(`%${varName}%`, String(varValue));
+                expression = expression.replaceAll(`%${varName}%`, (match) => {
+                    this.debug_echo(`${match} has been replaced by ${varValue}`);
+                    return varValue;
+                });
             }
 
             if (!expression) {

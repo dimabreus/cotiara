@@ -1,3 +1,5 @@
+// CodeMirror initialization
+
 const codeEditor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
     mode: "cotiara",
     theme: "monokai",
@@ -16,14 +18,11 @@ customPairs.split('').forEach(function (char) {
             if (selection.length > 0) {
                 var openChar = char;
                 var closeChar = char;
-
-                // Найти парный закрывающий символ
                 switch (char) {
                     case '{': closeChar = '}'; break;
                     case '[': closeChar = ']'; break;
                     case '(': closeChar = ')'; break;
                     case '%': closeChar = '%'; break;
-                    // для кавычек нет необходимости менять closeChar
                 }
 
                 cm.replaceSelection(openChar + selection + closeChar);
@@ -35,17 +34,22 @@ customPairs.split('').forEach(function (char) {
     });
 });
 
-document.getElementById('runBtn').addEventListener('click', function () {
+// Run file
+
+document.getElementById('runBtn').addEventListener('click', runFile);
+
+function runFile() {
+    document.getElementById('debugLogs').innerHTML = ""
     let code = codeEditor.getValue();
     let output = []
 
     const interpreter = new window.interpreter(
-        text => { output.push(text); document.getElementById('output').innerHTML = `Результат выполнения вашего кода: <br/> ${output.join("<br/>")}` },
-        key => { output.push(`pressed: ${key}`); document.getElementById('output').innerHTML = `Результат выполнения вашего кода: <br/> ${output.join("<br/>")}` },
-        (x, y) => { output.push(`moved to: ${x}, ${y}`); document.getElementById('output').innerHTML = `Результат выполнения вашего кода: <br/> ${output.join("<br/>")}` },
-        (x, y) => { output.push(`leftclick on: ${x}, ${y}`); document.getElementById('output').innerHTML = `Результат выполнения вашего кода: <br/> ${output.join("<br/>")}` },
-        (x, y) => { output.push(`rightclick on: ${x}, ${y}`); document.getElementById('output').innerHTML = `Результат выполнения вашего кода: <br/> ${output.join("<br/>")}` },
-        (t) => {addDebugLog(t)}
+        text => { output = addOutput(text, output); },
+        key => { output = addOutput(`pressed: ${key}`, output, "emulation"); },
+        (x, y) => { output = addOutput(`moved to: ${x}, ${y}`, output, "emulation"); },
+        (x, y) => { output = addOutput(`leftclick on: ${x}, ${y}`, output, "emulation"); },
+        (x, y) => { output = addOutput(`rightclick on: ${x}, ${y}: ${x}, ${y}`, output, "emulation"); },
+        (t) => { addDebugLog(t) }
     );
 
     code = code.replace(/\n?\/\*.*?\*\/\n?/gs, '');
@@ -61,14 +65,23 @@ document.getElementById('runBtn').addEventListener('click', function () {
     interpreter.interpret(code[Symbol.iterator]());
 
     const end = new Date();
-
     const dif = end - start;
 
     addDebugLog(`Код завершен, затраченное время: ${dif}мс`)
     console.log(output)
 
     document.getElementById('output').innerHTML = `Результат выполнения вашего кода: <br/> ${output.join("<br/>")}`;
-});
+}
+
+function addOutput(message, output, type = "default") {
+    if (type === "default") {
+        output.push(`<span class="default"> ${message} </span>`);
+    } else if (type === "emulation") {
+        output.push(`<span class="emulation"> ${message} </span>`);
+    }
+    document.getElementById('output').innerHTML = `Результат выполнения вашего кода: <br/> ${output.join("<br/>")}`;
+    return output
+}
 
 function addDebugLog(message) {
     const debugLogs = document.getElementById('debugLogs');
@@ -76,12 +89,10 @@ function addDebugLog(message) {
     debugLogs.innerHTML += `[${timestamp}] ${message}<br>`;
 }
 
+// keyboard shortcuts
 
 document.addEventListener('keydown', function (event) {
     if (event.shiftKey && event.altKey) {
-        // Проверяем, что нажата буква F
-        // event.keyCode === 70 для F
-        // используется event.key === 'f' или 'F' для современных браузеров
         if (event.key === 'f' || event.key === 'F') {
             const currentCode = codeEditor.getValue();
             const formattedCode = formatCode(currentCode);
@@ -94,12 +105,12 @@ document.addEventListener('keydown', function (event) {
 
     if (event.ctrlKey) {
         if (event.key === "Enter") {
-            alert("Ага, ща, пошел нахуй!")
+            runFile()
         }
     }
 });
 
-
+// Format Code
 
 
 document.getElementById('formatBtn').addEventListener('click', function () {

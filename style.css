@@ -9,7 +9,8 @@
     --button-hover-color: #444;
 }
 
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
@@ -23,11 +24,12 @@ body, html {
     margin: 20px auto;
     padding: 20px;
     background-color: var(--box-background-color);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
 }
 
-header, footer {
+header,
+footer {
     text-align: center;
     margin-bottom: 20px;
 }
@@ -76,12 +78,16 @@ button:hover {
 .debug-logs {
     margin-top: 20px;
     padding: 10px;
-    background-color: #222; /* Чуть темнее, чем основной вывод, для различия */
+    background-color: #222;
+    /* Чуть темнее, чем основной вывод, для различия */
     border: 1px solid #333;
-    color: #ff6a00; /* Оранжевый цвет текста для дебаг логов */
+    color: #ff6a00;
+    /* Оранжевый цвет текста для дебаг логов */
     border-radius: 4px;
-    min-height: 50px; /* Установите минимальную высоту, чтобы консоль была видна даже без логов */
-    overflow: auto; /* При необходимости добавляется прокрутка */
+    min-height: 50px;
+    /* Установите минимальную высоту, чтобы консоль была видна даже без логов */
+    overflow: auto;
+    /* При необходимости добавляется прокрутка */
 }
 
 
@@ -94,4 +100,8 @@ footer a {
 footer a:hover {
     color: var(--accent-hover-color);
     text-decoration: underline;
+}
+
+.emulation {
+    color: #ffb300;
 }
