@@ -1,6 +1,0 @@
-func aboba(a, b) {
-    var c = %a% + %b%
-    echo %c%
-}
-
-call aboba(2, 2)
