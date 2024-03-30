@@ -15,7 +15,7 @@ class Interpreter {
         this.move = move;
         this.leftClick = leftClick;
         this.rightClick = rightClick;
-        this.debug_echo = debug_echo
+        this.debug_echo = debug_echo;
     }
 
     interpret(expressions) {
