@@ -28,7 +28,7 @@ const commands = [
         regular: /^if (.+) \{(.*)\}?$/,
         flags: "s",
         syntax: "if <condition> {<code>}",
-        method: "_start_if",
+        method: "_startIf",
         parameters: 2
     },
     {
