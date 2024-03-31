@@ -2,7 +2,7 @@ import requests
 import json
 
 # URL вашего API
-url = 'http://localhost:3000/run'
+url = 'https://cotiara.onrender.com/run'
 
 # Код JavaScript, который вы хотите выполнить
 code = """
