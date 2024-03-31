@@ -1,21 +1,20 @@
 import re
-import sys
 
-import keyboard
-import pyautogui
-
-from commands import commands
-from expressionEvaluator import ExpressionEvaluator
-from function import Function
-
-pyautogui.FAILSAFE = False
+from .commands import commands
+from .expressionEvaluator import ExpressionEvaluator
+from .function import Function
 
 
 class Interpreter:
-    def __init__(self):
+    def __init__(self, echo, press, move, left_click, right_click):
         self.vars = {}
         self.functions = {}
         self.evaluator = ExpressionEvaluator(self.vars)
+        self.echo = echo
+        self.press = press
+        self.move = move
+        self.left_click = left_click
+        self.right_click = right_click
 
     def interpret(self, expressions):
         for expression in expressions:
@@ -97,11 +96,7 @@ class Interpreter:
 
     def _echo(self, expression):
         output = re.match(r"^echo (.*)$", expression).group(1)
-
-        for var_name, var_value in self.vars.items():
-            output = output.replace(f"%{var_name}%", str(var_value))
-
-        print(output)
+        self.echo(output)
 
     def _start_loop(self, expression, all_expressions):
         times = int(re.match(r"loop (\d+)", expression).group(1))
@@ -118,70 +113,16 @@ class Interpreter:
 
     def _press(self, expression):
         button = re.match(r"^press (.*)$", expression).group(1)
-
-        for var_name, var_value in self.vars.items():
-            button = button.replace(f"%{var_name}%", str(var_value))
-        pyautogui.press(button)
+        self.press(button)
 
     def _move(self, expression):
-        for var_name, var_value in self.vars.items():
-            expression = expression.replace(f"%{var_name}%", str(var_value))
-
         x, y = re.match(r"^move (\d+) (\d+)$", expression).groups()
-
-        pyautogui.moveTo(int(x), int(y))
+        self.move(int(x), int(y))
 
     def _left_click(self, expression):
-        for var_name, var_value in self.vars.items():
-            expression = expression.replace(f"%{var_name}%", str(var_value))
-
         x, y = re.match(r"^leftClick (\d+) (\d+)$", expression).groups()
-
-        pyautogui.leftClick(int(x), int(y))
+        self.left_click(int(x), int(y))
 
     def _right_click(self, expression):
-        for var_name, var_value in self.vars.items():
-            expression = expression.replace(f"%{var_name}%", str(var_value))
-
-        print(expression)
-
         x, y = re.match(r"^rightClick (\d+) (\d+)$", expression).groups()
-
-        pyautogui.rightClick(int(x), int(y))
-
-    def listen_for_key_events(self):
-        if 'on_press' in self.functions:
-
-            def on_event(event):
-                try:
-                    if event.event_type in ['down', 'up']:
-                        state = 0 if event.event_type == 'down' else 1
-                        function = self.functions['on_press']
-                        self.vars[function.parameters[0]] = state
-                        self.vars[function.parameters[1]] = event.scan_code
-                        self.interpret(iter(function.expressions))
-                except Exception as e:
-                    print(f"Error during key event handling: {e}")
-
-            keyboard.hook(lambda event: on_event(event))
-
-
-if __name__ == "__main__":
-    argv = sys.argv[1:]
-
-    if not argv:
-        print("Error: No file path provided. Please specify the path to the file you wish to process.\n"
-              "Syntax: python main.py \"path/to/your/file\"")
-        quit()
-
-    filename = argv[0]
-
-    interpreter = Interpreter()
-    with open(filename, "r", encoding="utf8") as file:
-        code = [line.strip() for line in file]
-        code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
-
-    interpreter.interpret(iter(code))
-    if 'on_press' in interpreter.functions:
-        interpreter.listen_for_key_events()
-        keyboard.wait('esc')
+        self.right_click(int(x), int(y))
