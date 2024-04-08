@@ -9,7 +9,7 @@ Cotiara — это язык программирования, предназна
 
 Перед использованием Cotiara убедитесь, что у вас есть интерпретатор.
 Можно скачать интерпретатор Cotiara как библиотеку используя pip.
-Также есть [онлайн-интерпретатор](https://dimabreus.ru/cotiara/).
+Доступен также [онлайн-интерпретатор](https://dimabreus.ru/cotiara/).
 Также есть [расширение для Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=dimabreus.cotiara),
 которое обеспечивает подсветку синтаксиса и форматирование кода на Cotiara.
 
