@@ -72,5 +72,12 @@ commands = [
         "syntax": "call <function_name>(<arguments>)",
         "method": "_call_function",
         "parameters": 1
+    },
+    {
+        "name": "import",
+        "regular": r"^import\s+.+\.cot$",
+        "method": "_import_file",
+        "parameters": 1,
+        "syntax": "import <filename>.cot",
     }
 ]

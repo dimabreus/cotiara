@@ -165,6 +165,22 @@ class Interpreter:
 
             keyboard.hook(lambda event: on_event(event))
 
+    def _import_file(self, expression):
+        # Извлекаем путь к файлу из выражения import
+        match = re.match(r"^import\s+(.+)\.cot$", expression)
+        if not match:
+            raise ValueError("Invalid import syntax. Expected 'import <filename>.cot'.")
+        filename = match.group(1) + ".cot"
+
+        # Читаем и интерпретируем содержимое файла
+        try:
+            with open(filename, "r", encoding="utf8") as file:
+                code = [line.strip() for line in file]
+                code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
+                self.interpret(iter(code))
+        except FileNotFoundError:
+            raise FileNotFoundError(f"File {filename} not found.")
+
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
