@@ -101,6 +101,16 @@ var orResult = true || false /* True */
 echo Привет, мир! /* Выводит текст: Привет, мир! */
 ```
 
+### Комментарии
+
+```cotiara
+/* Комментарий */
+
+/*
+Многострочный комментарий
+*/
+```
+
 ### Циклы и условные конструкции
 
 ```cotiara
@@ -126,6 +136,83 @@ func sum (a, b) {
 
 /* Вызов функции */
 call sum(2, 2) /* Выводит: 4 */
+```
+
+### Импорты
+
+#### import
+Интерпретация кода файла, не передавая переменные и функции
+
+##### Правильное использование:
+
+```cotiara
+/* hello.cot */
+
+echo Hello, World!
+```
+
+```cotiara
+/* main.cot */
+
+import hello.cot
+/* 
+Hello, World!
+*/
+```
+
+##### Неправильное использование:
+
+```cotiara
+/* variables.cot */
+
+var a = 2
+var b = 4
+```
+
+```cotiara
+/* main.cot */
+
+import variables.cot
+
+echo %a% /* %a% (переменная не найдена) */
+```
+
+### import from
+Интерпретация кода и получение переменной или функции
+
+```cotiara
+/* variables.cot */
+
+var a = 2
+var b = 4
+```
+
+```cotiara
+/* main.cot */
+
+import a from variables.cot
+
+echo %a% /* 2 */
+echo %b% /* %b% (переменная не найдена) */
+```
+
+---
+
+```cotiara
+/* functions.cot */
+
+func sum(a, b) {
+    var c = %a% + %b%
+    echo %c%
+}
+```
+
+```cotiara
+/* main.cot */
+
+import sum from functions.cot
+
+call sum(5, 5) /* 10 */
 ```
 
 ### Управление мышью и клавиатурой
