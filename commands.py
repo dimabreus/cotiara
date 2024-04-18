@@ -75,9 +75,9 @@ commands = [
     },
     {
         "name": "import",
-        "regular": r"^import\s+.+\.cot$",
-        "method": "_import_file",
+        "regular": r"^import\s(\w+)\.cot|import\s(\w+)\sfrom\s(\w+)\.cot$",
+        "method": "_import",
         "parameters": 1,
-        "syntax": "import <filename>.cot",
+        "syntax": "import <filename>.cot or import <variable or function> from <filename>.cot",
     }
 ]
