@@ -62,7 +62,7 @@ var product = 2 * 3 /* 6 */
 var quotient = 6 / 2 /* 3 */
 ```
 
-### Логические операции
+### Операторы сравнения
 
 ```cotiara
 /* Равенство */
@@ -70,7 +70,30 @@ var isEqual = 1 == 1 /* True */
 
 /* Неравенство */
 var isNotEqual = 1 != 2 /* True */
+
+/* Больше */
+var isGreaterThan = 5 > 3 /* True */
+
+/* Меньше */
+var isLessThan = 3 < 5 /* True */
+
+/* Больше или равно */
+var isGreaterOrEqual = 5 >= 5 /* True */
+
+/* Меньше или равно */
+var isLessOrEqual = 3 <= 5 /* True */
 ```
+
+### Логические операторы
+
+```cotiara
+/* Логическое И (AND) */
+var andResult = true && false /* False */
+
+/* Логическое ИЛИ (OR) */
+var orResult = true || false /* True */
+```
+
 
 ### Вывод текста на экран
 
