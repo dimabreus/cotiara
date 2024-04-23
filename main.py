@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 
@@ -166,40 +167,33 @@ class Interpreter:
             keyboard.hook(lambda event: on_event(event))
 
     def _import(self, expression):
-        # Извлекаем путь к файлу из выражения import
         match = re.match(r"^import\s(\w+)\.cot|import\s(\w+)\sfrom\s(\w+)\.cot$", expression)
         groups = tuple(x for x in match.groups() if x is not None)
 
-        if len(groups) == 1:
-            filename = groups[0] + ".cot"
+        base_dir = os.path.dirname(os.path.abspath(sys.argv[1]))
 
-            try:
-                with open(filename, "r", encoding="utf8") as file:
-                    code = [line.strip() for line in file]
-                    code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
-                    interpreter = Interpreter()
-                    interpreter.interpret(iter(code))
-            except FileNotFoundError:
-                raise FileNotFoundError(f"File {filename} not found.")
+        if len(groups) == 1:
+            filename = os.path.join(base_dir, groups[0] + ".cot")
         else:
             to_import, filename = groups
-            filename += ".cot"
+            filename = os.path.join(base_dir, filename + ".cot")
 
-            try:
-                with open(filename, "r", encoding="utf8") as file:
-                    code = [line.strip() for line in file]
-                    code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
-                    interpreter = Interpreter()
-                    interpreter.interpret(iter(code))
+        try:
+            with open(filename, "r", encoding="utf8") as file:
+                code = [line.strip() for line in file]
+                code = re.sub(r"\n?/\*.*?\*/\n?", "", "\n".join(code), flags=re.DOTALL).split("\n")
+                interpreter = Interpreter()
+                interpreter.interpret(iter(code))
 
-                    if to_import in interpreter.vars.keys():
+                if len(groups) > 1:
+                    if to_import in interpreter.vars:
                         self.vars[to_import] = interpreter.vars[to_import]
-                    elif to_import in interpreter.functions.keys():
+                    elif to_import in interpreter.functions:
                         self.functions[to_import] = interpreter.functions[to_import]
                     else:
                         raise ImportError(f"Variable or function {to_import} not found.")
-            except FileNotFoundError:
-                raise FileNotFoundError(f"File {filename} not found.")
+        except FileNotFoundError:
+            raise FileNotFoundError(f"File {filename} not found.")
 
 
 if __name__ == "__main__":
